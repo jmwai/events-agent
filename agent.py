@@ -1,42 +1,60 @@
 import datetime
 from zoneinfo import ZoneInfo
-from google.adk.agents import Agent
-from google.adk.tools import google_search, tool
+from google.adk.agents import Agent, SequentialAgent
+from google.adk.tools import FunctionTool, google_search
 
-@tool
-def get_city(city: str) -> str:
-    """Returns the city name from the location string"""
-    available_cities = ["nairobi", "mombasa"]
-    if city.lower() in available_cities:
-        return city
-    else:
-        raise ValueError(f"Sorry, I don't have events for {city}.")
+GEMINI_MODEL = "gemini-2.5-flash"
 
-@tool
+
+# === Internal tools for city and date info ===
+def get_city() -> str:
+    """Returns a city name. You can customize this to use user input."""
+    return "Nairobi"
+
 def get_start_date() -> str:
-    """Returns the current date in Africa/Nairobi timezone"""
-    tz = ZoneInfo("Africa/Nairobi")
-    now = datetime.datetime.now(tz)
+    """Today's date in Africa/Nairobi timezone."""
+    now = datetime.datetime.now(ZoneInfo("Africa/Nairobi"))
     return now.strftime("%Y-%m-%d")
 
-@tool
 def get_end_date() -> str:
-    """Returns the date two days from now in Africa/Nairobi timezone"""
-    tz = ZoneInfo("Africa/Nairobi")
-    now = datetime.datetime.now(tz)
+    """Two days from now in Africa/Nairobi timezone."""
+    now = datetime.datetime.now(ZoneInfo("Africa/Nairobi"))
     return (now + datetime.timedelta(days=2)).strftime("%Y-%m-%d")
 
-root_agent = Agent(
-    name="Executor",
-    model="gemini-2.0-pro-vision",  # or gemini-2.0-pro if you want function calling support
-    description="Finds events and attractions in a city",
+
+# === info_agent ===
+
+info_agent = Agent(
+    name="info_agent",
+    model=GEMINI_MODEL,
+    description="Gathers city and date info.",
     instruction="""
-        You're an AI executor. Use tools like google_search, get_city, get_start_date, and get_end_date
-        to find and return events in a given city between given dates. 
-        Return the plan as a JSON list of events under the 'plan' key.
+        Use get_city, get_start_date, and get_end_date tools.
+        Store results in session_state["city"], ["start_date"], and ["end_date"].
     """,
-    tools=[google_search, get_city, get_start_date, get_end_date],
-    output_key="plan"
+    tools=[get_city, get_start_date, get_end_date]
+)
+
+# === search_agent ===
+
+search_agent = Agent(
+    name="search_agent",
+    model=GEMINI_MODEL,
+    description="Finds events using google_search.",
+    instruction="""
+        Use google_search to find events in session_state["city"] 
+        between session_state["start_date"] and session_state["end_date"].
+        Return the results as a list of events.
+    """,
+    tools=[google_search]
+)
+
+# === root_agent ===
+
+root_agent = SequentialAgent(
+    name="event_planner_root",
+    description="Plans events by combining info_agent and search_agent.",
+    sub_agents=[info_agent, search_agent],
 )
 
 #message="Find me a weekend plan for Nairobi between 2025-07-25 and 2025-07-27",
