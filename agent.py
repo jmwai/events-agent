@@ -9,7 +9,7 @@ GEMINI_MODEL = "gemini-2.5-flash"
 # === Internal tools for city and date info ===
 def get_city() -> str:
     """Returns a city name. You can customize this to use user input."""
-    return "Nairobi"
+    return "Mombasa"
 
 def get_start_date() -> str:
     """Today's date in Africa/Nairobi timezone."""
@@ -19,7 +19,7 @@ def get_start_date() -> str:
 def get_end_date() -> str:
     """Two days from now in Africa/Nairobi timezone."""
     now = datetime.datetime.now(ZoneInfo("Africa/Nairobi"))
-    return (now + datetime.timedelta(days=2)).strftime("%Y-%m-%d")
+    return (now + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
 
 
 # === info_agent ===
@@ -42,9 +42,9 @@ search_agent = Agent(
     model=GEMINI_MODEL,
     description="Finds events using google_search.",
     instruction="""
-        Use google_search to find events in session_state["city"] 
+        Use google_search to find top 10 events in session_state["city"] 
         between session_state["start_date"] and session_state["end_date"].
-        Return the results as a list of events.
+        Return the results in a JSON format.
     """,
     tools=[google_search]
 )
