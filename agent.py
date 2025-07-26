@@ -57,4 +57,3 @@ root_agent = SequentialAgent(
     sub_agents=[info_agent, search_agent],
 )
 
-#message="Find me a weekend plan for Nairobi between 2025-07-25 and 2025-07-27",
