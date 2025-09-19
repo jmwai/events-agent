@@ -29,6 +29,11 @@ jobs:
 
     - name: Install ADK
       run: pip install google-adk
+    
+    - name: List repo files
+      run: |
+            pwd
+            ls -R .
 
 
     - name: Deploy to Cloud Run
