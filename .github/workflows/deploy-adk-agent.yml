@@ -37,4 +37,5 @@ jobs:
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --service_name=events-agent \
           --app_name=events-agent \
-          --region=europe-west1
+          --region=europe-west1 \
+          ./events_agent
