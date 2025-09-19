@@ -33,8 +33,7 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         adk deploy cloud_run \
-          --project_id=${{ secrets.GCP_PROJECT_ID }} \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
           --service_name=events-agent \
-          --agent_path=. \
-          --agent_name=events-agent \
+          --app_name=events-agent \
           --region=europe-west1
