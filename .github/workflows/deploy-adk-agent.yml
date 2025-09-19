@@ -30,12 +30,7 @@ jobs:
     - name: Install ADK
       run: pip install google-adk
     
-    - name: List repo files
-      run: |
-            pwd
-            ls -R .
-
-
+    
     - name: Deploy to Cloud Run
       working-directory: .
       run: |
@@ -45,3 +40,10 @@ jobs:
           --app_name=events-agent \
           --region=europe-west1 \
           ./events_agent
+    
+    - name: Fetch deployed service URL
+      run: |
+          # Use gcloud to get the service's URL
+          URL=$(gcloud run services describe ${SERVICE_NAME} --project ${GCP_PROJECT} --region ${GCP_LOCATION} --format="value(status.url)")
+          echo "Service URL: $URL"
+          echo "::set-output name=service_url::$URL"
