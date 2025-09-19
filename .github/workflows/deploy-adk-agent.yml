@@ -32,6 +32,7 @@ jobs:
 
 
     - name: Deploy to Cloud Run
+      working-directory: .
       run: |
         adk deploy cloud_run \
           --project=${{ secrets.GCP_PROJECT_ID }} \
