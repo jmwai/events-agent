@@ -9,7 +9,7 @@ GEMINI_MODEL = "gemini-2.5-flash"
 # === Internal tools for city and date info ===
 def get_city() -> str:
     """Returns a city name. You can customize this to use user input."""
-    return "Mombasa"
+    return "Nairobi"
 
 def get_start_date() -> str:
     """Today's date in Africa/Nairobi timezone."""
