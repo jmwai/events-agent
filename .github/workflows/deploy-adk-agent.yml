@@ -28,7 +28,7 @@ jobs:
         python-version: '3.11'
 
     - name: Install ADK
-      run: pip install --upgrade adk
+      run: pip install adk==1.14.1
 
     - name: Deploy to Cloud Run
       run: |
